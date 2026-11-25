@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'firebase_options.dart';
+import 'auth/auth_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +20,7 @@ class MentalZenApp extends StatelessWidget {
     return const MaterialApp(
       title: 'Mental Zen',
       debugShowCheckedModeBanner: false,
-      home: Scaffold(body: Center(child: Text('Welcome to Mental Zen'))),
+      home: AuthGate(),
     );
   }
 }
