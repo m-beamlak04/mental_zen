@@ -49,4 +49,8 @@ class AuthService {
     await _googleSignIn.signOut();
     await _auth.signOut();
   }
+
+  Future<void> resetPassword(String email) {
+    return _auth.sendPasswordResetEmail(email: email.trim());
+  }
 }

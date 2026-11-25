@@ -86,6 +86,47 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _resetPassword() async {
+    if (_busy) return;
+
+    final email = _email.text.trim();
+
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid email address.')),
+      );
+      return;
+    }
+
+    setState(() => _busy = true);
+
+    try {
+      await _auth.resetPassword(email);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'If an account exists, a password reset email will be sent.',
+            ),
+          ),
+        );
+      }
+    } on FirebaseAuthException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to request password reset. Try again.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _busy = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,6 +178,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                     return null;
                   },
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _busy ? null : _resetPassword,
+                    child: const Text('Forgot Password?'),
+                  ),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
