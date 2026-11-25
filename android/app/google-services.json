@@ -12,7 +12,20 @@
           "package_name": "com.example.mental_zen"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "588499402850-icsb2c06k0piohpa9dmkdqqdhiumoblk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mental_zen",
+            "certificate_hash": "809a335e476aa436c7bbf409e7eda12949db2645"
+          }
+        },
+        {
+          "client_id": "588499402850-99gla56m2ct7c5hd1n5h5dkusmm6o28a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDfaDFCDhyILBYK49Umgv7xU7IYDmTszJQ"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "588499402850-99gla56m2ct7c5hd1n5h5dkusmm6o28a.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "588499402850-b1er71ibbjftd1hj1rhfnf5r3n10pjoo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mentalZen"
+              }
+            }
+          ]
         }
       }
     }

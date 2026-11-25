@@ -63,6 +63,29 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    if (_busy) return;
+
+    setState(() => _busy = true);
+
+    try {
+      await _auth.signInWithGoogle();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Google sign-in was cancelled or failed.'),
+          ),
+        );
+      }
+      debugPrint('Google sign-in error: $error');
+    } finally {
+      if (mounted) {
+        setState(() => _busy = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,6 +146,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       : const Text('Sign In'),
                 ),
                 const SizedBox(height: 16),
+                const Text('OR'),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : _signInWithGoogle,
+                  icon: const Icon(Icons.login),
+                  label: const Text('Continue with Google'),
+                ),
                 TextButton(
                   onPressed: _busy
                       ? null
