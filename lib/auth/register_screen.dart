@@ -122,6 +122,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Create Account')),
       body: Center(
@@ -131,40 +133,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'Join Mental Zen',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                Icon(Icons.spa, size: 56, color: theme.colorScheme.primary),
+                const SizedBox(height: 16),
+                Text(
+                  'Begin Your Journey',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
+                Text(
+                  'Create your personal space for reflection and growth.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 32),
                 TextFormField(
                   controller: _firstName,
                   decoration: const InputDecoration(
                     labelText: 'First Name',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person_outline),
                   ),
                   validator: (value) => value == null || value.trim().isEmpty
                       ? 'First name is required.'
                       : null,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _lastName,
                   decoration: const InputDecoration(
                     labelText: 'Last Name',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person_outline),
                   ),
                   validator: (value) => value == null || value.trim().isEmpty
                       ? 'Last name is required.'
                       : null,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.email_outlined),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -177,13 +193,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _password,
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock_outline),
                   ),
                   validator: (value) {
                     if (value == null || value.length < 6) {
@@ -192,13 +208,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _confirmPassword,
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: 'Confirm Password',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock_outline),
                   ),
                   validator: (value) {
                     if (value != _password.text) {
@@ -211,10 +227,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ElevatedButton(
                   onPressed: _busy ? null : _submit,
                   child: _busy
-                      ? const CircularProgressIndicator()
-                      : const Text('Register'),
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Create Account'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 TextButton(
                   onPressed: _busy ? null : () => Navigator.pop(context),
                   child: const Text('Already have an account? Sign In'),

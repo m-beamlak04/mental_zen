@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'firebase_options.dart';
 import 'auth/auth_gate.dart';
+import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,10 +18,11 @@ class MentalZenApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Mental Zen',
       debugShowCheckedModeBanner: false,
-      home: AuthGate(),
+      theme: AppTheme.lightTheme,
+      home: const AuthGate(),
     );
   }
 }

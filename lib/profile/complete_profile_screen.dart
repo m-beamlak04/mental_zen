@@ -65,6 +65,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Complete Profile'),
@@ -83,19 +85,31 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.account_circle, size: 72),
+                Icon(Icons.spa, size: 64, color: theme.colorScheme.primary),
                 const SizedBox(height: 16),
                 Text(
-                  'Finish setting up your account',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  "Let's Get to Know You",
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
+                Text(
+                  'Personalize your Mental Zen experience.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 32),
                 TextFormField(
                   controller: _firstName,
                   decoration: const InputDecoration(
                     labelText: 'First Name',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person_outline),
                   ),
                   validator: (value) => value == null || value.trim().isEmpty
                       ? 'Enter your first name'
@@ -106,7 +120,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   controller: _lastName,
                   decoration: const InputDecoration(
                     labelText: 'Last Name',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person_outline),
                   ),
                   validator: (value) => value == null || value.trim().isEmpty
                       ? 'Enter your last name'
@@ -115,7 +129,13 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _busy ? null : _saveProfile,
-                  child: Text(_busy ? 'Saving...' : 'Save Profile'),
+                  child: _busy
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Save Profile'),
                 ),
               ],
             ),

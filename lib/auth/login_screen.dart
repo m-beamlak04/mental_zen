@@ -129,8 +129,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Mental Zen Login')),
+      appBar: AppBar(title: const Text('Mental Zen')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -138,20 +140,32 @@ class _LoginScreenState extends State<LoginScreen> {
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.spa, size: 64),
-                const SizedBox(height: 20),
-                const Text(
-                  'Welcome Back',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                Icon(Icons.spa, size: 64, color: theme.colorScheme.primary),
+                const SizedBox(height: 16),
+                Text(
+                  'Find Your Balance',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
+                Text(
+                  'Take a moment for yourself today.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 32),
                 TextFormField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.email_outlined),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -170,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: 'Password',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock_outline),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -186,21 +200,41 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('Forgot Password?'),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _busy ? null : _submit,
                   child: _busy
-                      ? const CircularProgressIndicator()
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                       : const Text('Sign In'),
                 ),
-                const SizedBox(height: 16),
-                const Text('OR'),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
+                const Row(
+                  children: [
+                    Expanded(child: Divider()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text('OR'),
+                    ),
+                    Expanded(child: Divider()),
+                  ],
+                ),
+                const SizedBox(height: 20),
                 OutlinedButton.icon(
                   onPressed: _busy ? null : _signInWithGoogle,
                   icon: const Icon(Icons.login),
                   label: const Text('Continue with Google'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 12),
                 TextButton(
                   onPressed: _busy
                       ? null
