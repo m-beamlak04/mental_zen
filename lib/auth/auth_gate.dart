@@ -46,33 +46,3 @@ class _AuthGateState extends State<AuthGate> {
     );
   }
 }
-
-class AuthenticatedScreen extends StatelessWidget {
-  const AuthenticatedScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final auth = AuthService();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Message Zen'),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await auth.signOut();
-            },
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign Out',
-          ),
-        ],
-      ),
-      body: Center(
-        child: Text(
-          'Signed in as ${auth.currentUser?.email ?? "Unknown"}',
-          style: const TextStyle(fontSize: 18),
-        ),
-      ),
-    );
-  }
-}

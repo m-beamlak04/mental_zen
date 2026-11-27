@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../auth/auth_service.dart';
 import 'user_service.dart';
 import 'complete_profile_screen.dart';
-import '../auth/auth_gate.dart';
+import '../home/home_screen.dart';
 
 class ProfileGate extends StatefulWidget {
   final User user;
@@ -75,7 +75,7 @@ class _ProfileGateState extends State<ProfileGate> {
           );
         }
 
-        return const AuthenticatedScreen();
+        return const HomeScreen();
       },
     );
   }
