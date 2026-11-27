@@ -17,7 +17,24 @@ class MoodService {
     return '$year-$month-$day';
   }
 
+  void _validateDate(String date) {
+    final validFormat = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+
+    if (!validFormat.hasMatch(date)) {
+      throw ArgumentError('Date must use YYYY-MM-DD format.');
+    }
+
+    final parsedDate = DateTime.tryParse(date);
+
+    if (parsedDate == null ||
+        parsedDate.toIso8601String().split('T').first != date) {
+      throw ArgumentError('Invalid calendar date.');
+    }
+  }
+
   DocumentReference<Map<String, dynamic>> _moodDocument(String date) {
+    _validateDate(date);
+
     final user = _auth.currentUser;
 
     if (user == null) {
@@ -44,19 +61,18 @@ class MoodService {
   }
 
   Stream<Mood?> watchMood(String date) {
-    return _moodDocument(date).snapshots().map((snapshot) {
-      final data = snapshot.data();
+    return _moodDocument(date)
+        .snapshots(includeMetadataChanges: true)
+        .where((snapshot) => !snapshot.metadata.hasPendingWrites)
+        .map((snapshot) {
+          final data = snapshot.data();
 
-      if (!snapshot.exists || data == null) {
-        return null;
-      }
+          if (!snapshot.exists || data == null) {
+            return null;
+          }
 
-      if (data['createdAt'] == null || data['updatedAt'] == null) {
-        return null;
-      }
-
-      return Mood.fromFirestore(data);
-    });
+          return Mood.fromFirestore(data);
+        });
   }
 
   Future<void> saveMood({
@@ -68,6 +84,12 @@ class MoodService {
       throw ArgumentError('Mood rating must be between 1 and 5.');
     }
 
+    final trimmedNote = note?.trim();
+
+    if (trimmedNote != null && trimmedNote.length > 500) {
+      throw ArgumentError('Mood note cannot exceed 500 characters.');
+    }
+
     final document = _moodDocument(date);
 
     await _firestore.runTransaction((transaction) async {
@@ -76,7 +98,7 @@ class MoodService {
       final data = <String, dynamic>{
         'date': date,
         'rating': rating,
-        'note': note,
+        'note': trimmedNote == null || trimmedNote.isEmpty ? null : trimmedNote,
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
