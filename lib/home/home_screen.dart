@@ -5,12 +5,117 @@ import '../mood/mood_trends_screen.dart';
 import '../journal/journal_screen.dart';
 import '../wellness/wellness_screen.dart';
 import '../settings/settings_screen.dart';
+import '../models/mood.dart';
+import '../mood/mood_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final MoodService _moodService = MoodService();
+
+  late Stream<Mood?> _todayMoodStream;
+
+  final List<String> _moodEmojis = ['😞', '🙁', '😐', '🙂', '😄'];
+  final List<String> _moodLabels = ['Awful', 'Bad', 'Okay', 'Good', 'Great'];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeMoodStream();
+  }
+
+  void _initializeMoodStream() {
+    _todayMoodStream = _moodService.watchMood(_moodService.getTodayDate());
+  }
 
   void _openScreen(BuildContext context, Widget screen) {
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
+  Widget _buildDailyMoodCard() {
+    final theme = Theme.of(context);
+
+    return Card(
+      color: theme.colorScheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: StreamBuilder<Mood?>(
+          stream: _todayMoodStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Column(
+                children: [
+                  const Text("Unable to load today's mood."),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _initializeMoodStream();
+                      });
+                    },
+                    child: const Text('Try Again'),
+                  ),
+                ],
+              );
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final mood = snapshot.data;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  mood == null ? 'How are you feeling today?' : "Today's Mood",
+                  style: theme.textTheme.titleLarge,
+                ),
+                const SizedBox(height: 20),
+
+                if (mood == null)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: _moodEmojis.map((emoji) {
+                      return Text(emoji, style: const TextStyle(fontSize: 28));
+                    }).toList(),
+                  )
+                else ...[
+                  Text(
+                    _moodEmojis[mood.rating - 1],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 48),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Feeling ${_moodLabels[mood.rating - 1]}',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ],
+
+                const SizedBox(height: 20),
+
+                ElevatedButton(
+                  onPressed: () => _openScreen(context, const MoodScreen()),
+                  child: Text(
+                    mood == null
+                        ? "Record Today's Mood"
+                        : "Update Today's Mood",
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -45,37 +150,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Daily mood check-in
-          Card(
-            color: theme.colorScheme.secondaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'How are you feeling today?',
-                    style: theme.textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 20),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('😞', style: TextStyle(fontSize: 28)),
-                      Text('🙁', style: TextStyle(fontSize: 28)),
-                      Text('😐', style: TextStyle(fontSize: 28)),
-                      Text('🙂', style: TextStyle(fontSize: 28)),
-                      Text('😄', style: TextStyle(fontSize: 28)),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => _openScreen(context, const MoodScreen()),
-                    child: const Text("Record Today's Mood"),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _buildDailyMoodCard(),
           const SizedBox(height: 16),
 
           // Today's reflection
