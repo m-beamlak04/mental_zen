@@ -8,6 +8,8 @@ import '../settings/settings_screen.dart';
 import '../models/mood.dart';
 import '../mood/mood_service.dart';
 
+import 'dart:async';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -15,10 +17,12 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final MoodService _moodService = MoodService();
 
   late Stream<Mood?> _todayMoodStream;
+  late String _currentDate;
+  Timer? _dateTimer;
 
   final List<String> _moodEmojis = ['😞', '🙁', '😐', '🙂', '😄'];
   final List<String> _moodLabels = ['Awful', 'Bad', 'Okay', 'Good', 'Great'];
@@ -26,11 +30,44 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
     _initializeMoodStream();
+
+    _dateTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => _checkDateChange(),
+    );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _dateTimer?.cancel();
+    super.dispose();
+  }
+
+  void _checkDateChange() {
+    final today = _moodService.getTodayDate();
+
+    if (today != _currentDate && mounted) {
+      setState(() {
+        _initializeMoodStream();
+      });
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkDateChange();
+    }
   }
 
   void _initializeMoodStream() {
-    _todayMoodStream = _moodService.watchMood(_moodService.getTodayDate());
+    _currentDate = _moodService.getTodayDate();
+    _todayMoodStream = _moodService.watchMood(_currentDate);
   }
 
   void _openScreen(BuildContext context, Widget screen) {

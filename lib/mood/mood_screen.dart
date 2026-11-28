@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'mood_service.dart';
 
+import 'dart:async';
+
 class MoodScreen extends StatefulWidget {
   const MoodScreen({super.key});
 
@@ -9,11 +11,12 @@ class MoodScreen extends StatefulWidget {
   State<MoodScreen> createState() => _MoodScreenState();
 }
 
-class _MoodScreenState extends State<MoodScreen> {
+class _MoodScreenState extends State<MoodScreen> with WidgetsBindingObserver {
   final MoodService _moodService = MoodService();
   final TextEditingController _noteController = TextEditingController();
 
-  late final String _date;
+  late String _date;
+  Timer? _dateTimer;
 
   int? _selectedRating;
   bool _isLoading = true;
@@ -27,14 +30,50 @@ class _MoodScreenState extends State<MoodScreen> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
     _date = _moodService.getTodayDate();
     _loadMood();
+
+    _dateTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => _checkDateChange(),
+    );
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _dateTimer?.cancel();
     _noteController.dispose();
     super.dispose();
+  }
+
+  void _checkDateChange() {
+    final today = _moodService.getTodayDate();
+
+    if (!mounted || _isSaving || _isLoading || today == _date) {
+      return;
+    }
+
+    setState(() {
+      _date = today;
+      _selectedRating = null;
+      _noteController.clear();
+      _hasExistingMood = false;
+      _loadError = null;
+      _isLoading = true;
+    });
+
+    _loadMood();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkDateChange();
+    }
   }
 
   Future<void> _loadMood() async {
@@ -64,6 +103,11 @@ class _MoodScreenState extends State<MoodScreen> {
   }
 
   Future<void> _saveMood() async {
+    if (_date != _moodService.getTodayDate()) {
+      _checkDateChange();
+      return;
+    }
+
     if (_selectedRating == null) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Please select a mood.')));
