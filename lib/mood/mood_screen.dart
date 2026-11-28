@@ -169,7 +169,7 @@ class _MoodScreenState extends State<MoodScreen> with WidgetsBindingObserver {
                 ? null
                 : () {
                     setState(() {
-                      _selectedRating = rating;
+                      _selectedRating = isSelected ? null : rating;
                     });
                   },
             child: Column(
